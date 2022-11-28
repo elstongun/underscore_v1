@@ -47,6 +47,7 @@ contract ItemListing is ReentrancyGuard {
     uint256 arbitratorApprove = 0;
     uint256 bought = 0;
     bool hasEnded = false;
+    bool hasBeenReviewed = false;
 
     constructor (
         string memory _name,
@@ -68,15 +69,23 @@ contract ItemListing is ReentrancyGuard {
      * @dev Throws if called by any account other than the Seller.
      */
     modifier onlySeller() {
-        require(msg.sender == seller, "R4");
+        require(msg.sender == seller);
         _;
     }
-    
+
     /**
      * @dev Throws if called by any account other than the Arbitrator.
      */
     modifier onlyArbitrator() {
-        require(msg.sender == arbitrator, "R4");
+        require(msg.sender == arbitrator);
+        _;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the Factory.
+     */
+    modifier onlyFactory() {
+        require(msg.sender == factory);
         _;
     }
 
@@ -186,6 +195,27 @@ contract ItemListing is ReentrancyGuard {
         else {
             return hasEnded;
         }
+    }
+
+    function setReview() public onlyFactory returns (bool) {
+        hasBeenReviewed = true;
+        return hasBeenReviewed;
+    }
+
+    function isReviewed() public view returns (bool) {
+        return hasBeenReviewed;
+    }
+
+    function getBuyer() public view returns (address) {
+        return buyer;
+    }
+    
+    function getSeller() public view returns (address) {
+        return seller;
+    }
+
+    function getFactory() public view returns (address) {
+        return factory;
     }
 
     function hasBeenBought() public view returns (uint256) {
